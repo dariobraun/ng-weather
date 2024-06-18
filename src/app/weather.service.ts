@@ -7,7 +7,7 @@ import { ConditionsAndZip } from './conditions-and-zip.type';
 import { Forecast } from './forecasts-list/forecast.type';
 import { LocationService } from './location.service';
 import { toObservable } from '@angular/core/rxjs-interop';
-import { map, switchMap } from 'rxjs/operators';
+import { catchError, map, switchMap } from 'rxjs/operators';
 
 @Injectable()
 export class WeatherService {
@@ -24,7 +24,13 @@ export class WeatherService {
   ).pipe(
     switchMap((locations) =>
       locations.length > 0
-        ? forkJoin(locations.map((loc) => this.requestCurrentConditions(loc)))
+        ? forkJoin(
+            locations.map((loc) =>
+              this.requestCurrentConditions(loc).pipe(
+                catchError(() => of(null)),
+              ),
+            ),
+          )
         : of([]),
     ),
   );

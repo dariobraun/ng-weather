@@ -8,11 +8,22 @@
         .tab-header {
             margin-right: 0.5rem;
             cursor: pointer;
+            padding: 0.5rem;
 
             button {
                 border: none;
                 background: none;
             }
         }
+
+        .tab-header.active {
+            background-color: #2964a3;
+            color: #ffffff
+        }
+    }
+
+    .tabs-content {
+        padding: 2rem 1rem 1rem;
+        border: 1px solid gray;
     }
 }

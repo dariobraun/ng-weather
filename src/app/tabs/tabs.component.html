@@ -1,14 +1,16 @@
-<div class="tab-list">
+<div *ngIf="tabs.length > 0" class="tab-list">
   <div class="tab-headers">
     <div
       *ngFor="let tab of tabs; let i = index"
       class="tab-header"
-      [class]="{ active: activeTabIndex() === i }"
+      [ngClass]="activeTabIndex() === i ? 'active' : ''"
       (click)="selectTab(i)"
     >
       {{ tab.title }}
-      <button (click)="closeBtn(i, $event)">x</button>
+      <button (click)="closeTab(i, $event)">x</button>
     </div>
   </div>
-  <ng-content></ng-content>
+  <div class="tabs-content">
+    <ng-content></ng-content>
+  </div>
 </div>

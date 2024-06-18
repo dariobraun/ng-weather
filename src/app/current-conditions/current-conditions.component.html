@@ -1,5 +1,5 @@
 <div *ngIf="currentConditionsByZip$ | async as currentConditionsByZip">
-  <app-tabs>
+  <app-tabs [closeTabCallback]="removeLocation">
     <app-tab
       *ngFor="let location of currentConditionsByZip"
       [title]="location.data.name"
@@ -21,11 +21,6 @@
           </p>
         </div>
         <div>
-          <span
-            class="close"
-            (click)="locationService.removeLocation(location.zip, $event)"
-            >&times;</span
-          >
           <img
             [src]="weatherService.getWeatherIcon(location.data.weather[0].id)"
             alt="Weather Icon"

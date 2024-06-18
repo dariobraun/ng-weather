@@ -24,10 +24,9 @@ export class LocationService {
     localStorage.setItem(LOCATIONS, JSON.stringify(this.locations()));
   }
 
-  removeLocation(zipcode: string, event: MouseEvent) {
-    event.stopPropagation();
+  removeLocation(indexToRemove: number) {
     this.locations.update((locations) =>
-      locations.filter((loc) => loc !== zipcode),
+      locations.filter((_, index) => index !== indexToRemove),
     );
     localStorage.setItem(LOCATIONS, JSON.stringify(this.locations()));
   }
