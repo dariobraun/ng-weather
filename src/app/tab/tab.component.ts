@@ -1,17 +1,14 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, signal } from '@angular/core';
+import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-tab',
   standalone: true,
-  imports: [],
+  imports: [NgIf],
   templateUrl: './tab.component.html',
   styleUrl: './tab.component.css',
 })
 export class TabComponent {
   @Input() title = '';
-  @Input() active = false;
-
-  closeBtn() {
-    console.log('close...');
-  }
+  active = signal<boolean>(false);
 }
