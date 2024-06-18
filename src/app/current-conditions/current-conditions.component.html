@@ -1,6 +1,6 @@
-<div>
+<div *ngIf="currentConditionsByZip$ | async as currentConditionsByZip">
   <div
-    *ngFor="let location of currentConditionsByZip()"
+    *ngFor="let location of currentConditionsByZip"
     class="well flex"
     (click)="showForecast(location.zip)"
   >
@@ -20,10 +20,15 @@
       </p>
     </div>
     <div>
-      <span class="close" (click)="locationService.removeLocation(location.zip)"
+      <span
+        class="close"
+        (click)="locationService.removeLocation(location.zip, $event)"
         >&times;</span
       >
-      <img [src]="weatherService.getWeatherIcon(location.data.weather[0].id)" />
+      <img
+        [src]="weatherService.getWeatherIcon(location.data.weather[0].id)"
+        alt="Weather Icon"
+      />
     </div>
   </div>
 </div>

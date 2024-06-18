@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { WeatherService } from '../weather.service';
 import { ActivatedRoute } from '@angular/router';
 import { Forecast } from './forecast.type';
@@ -8,17 +8,17 @@ import { Forecast } from './forecast.type';
   templateUrl: './forecasts-list.component.html',
   styleUrls: ['./forecasts-list.component.css'],
 })
-export class ForecastsListComponent {
+export class ForecastsListComponent implements OnInit {
+  protected weatherService = inject(WeatherService);
+  route = inject(ActivatedRoute);
+
   zipcode: string;
   forecast: Forecast;
 
-  constructor(
-    protected weatherService: WeatherService,
-    route: ActivatedRoute,
-  ) {
-    route.params.subscribe((params) => {
+  ngOnInit() {
+    this.route.params.subscribe((params) => {
       this.zipcode = params['zipcode'];
-      weatherService
+      this.weatherService
         .getForecast(this.zipcode)
         .subscribe((data) => (this.forecast = data));
     });
