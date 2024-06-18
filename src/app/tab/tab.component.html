@@ -1,0 +1,7 @@
+<div class="tab-header">
+  {{ title }}
+  <button (click)="closeBtn()">x</button>
+</div>
+<div *ngIf="active" class="tab-content">
+  <ng-content></ng-content>
+</div>

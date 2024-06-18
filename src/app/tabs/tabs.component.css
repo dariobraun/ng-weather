@@ -1,0 +1,7 @@
+.tab-list {
+    display: flex;
+
+    app-tab {
+        padding: 0.5rem;
+    }
+}

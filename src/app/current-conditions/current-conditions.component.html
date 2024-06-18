@@ -31,4 +31,11 @@
       />
     </div>
   </div>
+  <app-tabs>
+    <app-tab
+      *ngFor="let location of currentConditionsByZip"
+      [title]="location.data.name"
+      >Hello</app-tab
+    >
+  </app-tabs>
 </div>
