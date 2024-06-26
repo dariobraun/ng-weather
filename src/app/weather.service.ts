@@ -7,7 +7,8 @@ import { ConditionsAndZip } from './conditions-and-zip.type';
 import { Forecast } from './forecasts-list/forecast.type';
 import { LocationService } from './location.service';
 import { toObservable } from '@angular/core/rxjs-interop';
-import { catchError, map, switchMap } from 'rxjs/operators';
+import { catchError, map, switchMap, tap } from 'rxjs/operators';
+import { CachingService } from './caching.service';
 
 @Injectable()
 export class WeatherService {
@@ -18,15 +19,21 @@ export class WeatherService {
 
   http = inject(HttpClient);
   locationService = inject(LocationService);
+  cachingService = inject(CachingService);
 
   private currentConditions = toObservable(
     this.locationService.getLocations(),
   ).pipe(
     switchMap((locations) => {
       return forkJoin(
-        locations.map((loc) =>
-          this.requestCurrentConditions(loc).pipe(catchError(() => of(null))),
-        ),
+        locations.map((zip) => {
+          const cachedData = this.cachingService.getCachedConditionData(zip);
+          return cachedData
+            ? of(cachedData)
+            : this.requestCurrentConditions(zip).pipe(
+                catchError(() => of(null)),
+              );
+        }),
       );
     }),
   );
@@ -36,7 +43,12 @@ export class WeatherService {
       .get<CurrentConditions>(
         `${WeatherService.URL}/weather?zip=${zipcode},us&units=imperial&APPID=${WeatherService.APPID}`,
       )
-      .pipe(map((data) => ({ data, zip: zipcode })));
+      .pipe(
+        map((data) => ({ data, zip: zipcode })),
+        tap((data) => {
+          this.cachingService.cacheConditionData(data);
+        }),
+      );
   }
 
   getCurrentConditions(): Observable<ConditionsAndZip[]> {
