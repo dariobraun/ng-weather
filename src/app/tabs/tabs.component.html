@@ -3,7 +3,7 @@
     <div
       *ngFor="let tab of tabs; let i = index"
       class="tab-header"
-      [ngClass]="activeTabIndex() === i ? 'active' : ''"
+      [ngClass]="activeTabIndex === i ? 'active' : ''"
       (click)="selectTab(i)"
     >
       {{ tab.title }}

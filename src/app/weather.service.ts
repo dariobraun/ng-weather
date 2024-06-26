@@ -19,20 +19,16 @@ export class WeatherService {
   http = inject(HttpClient);
   locationService = inject(LocationService);
 
-  private conditions$: Observable<ConditionsAndZip[]> = toObservable(
+  private currentConditions = toObservable(
     this.locationService.getLocations(),
   ).pipe(
-    switchMap((locations) =>
-      locations.length > 0
-        ? forkJoin(
-            locations.map((loc) =>
-              this.requestCurrentConditions(loc).pipe(
-                catchError(() => of(null)),
-              ),
-            ),
-          )
-        : of([]),
-    ),
+    switchMap((locations) => {
+      return forkJoin(
+        locations.map((loc) =>
+          this.requestCurrentConditions(loc).pipe(catchError(() => of(null))),
+        ),
+      );
+    }),
   );
 
   requestCurrentConditions(zipcode: string): Observable<ConditionsAndZip> {
@@ -44,7 +40,7 @@ export class WeatherService {
   }
 
   getCurrentConditions(): Observable<ConditionsAndZip[]> {
-    return this.conditions$;
+    return this.currentConditions;
   }
 
   getForecast(zipcode: string): Observable<Forecast> {

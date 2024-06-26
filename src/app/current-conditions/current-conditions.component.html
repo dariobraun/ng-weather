@@ -2,7 +2,7 @@
   <app-tabs [closeTabCallback]="removeLocation">
     <app-tab
       *ngFor="let location of currentConditionsByZip"
-      [title]="location.data.name"
+      [title]="location.data.name + ' ' + '(' + location.zip + ')'"
     >
       <div class="well flex" (click)="showForecast(location.zip)">
         <div>
