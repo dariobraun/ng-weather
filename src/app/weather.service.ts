@@ -37,7 +37,9 @@ export class WeatherService {
   );
 
   requestCurrentConditions(zipcode: string): Observable<ConditionsAndZip> {
-    const cachedData = this.cachingService.getCachedData(CONDITIONS + zipcode);
+    const cachedData = this.cachingService.getCachedData<ConditionsAndZip>(
+      CONDITIONS + zipcode,
+    );
     return cachedData
       ? of(cachedData)
       : this.http
@@ -47,7 +49,7 @@ export class WeatherService {
           .pipe(
             map((data) => ({ data, zip: zipcode })),
             tap((data) => {
-              this.cachingService.cacheData(
+              this.cachingService.cacheData<ConditionsAndZip>(
                 CONDITIONS + data.zip,
                 data,
                 this.cacheExpiresInSeconds(),
@@ -62,7 +64,9 @@ export class WeatherService {
   }
 
   getForecast(zipcode: string): Observable<Forecast> {
-    const cachedData = this.cachingService.getCachedData(FORECAST + zipcode);
+    const cachedData = this.cachingService.getCachedData<Forecast>(
+      FORECAST + zipcode,
+    );
     return cachedData
       ? of(cachedData)
       : this.http
@@ -71,7 +75,7 @@ export class WeatherService {
           )
           .pipe(
             tap((data) => {
-              this.cachingService.cacheData(
+              this.cachingService.cacheData<Forecast>(
                 FORECAST + zipcode,
                 data,
                 this.cacheExpiresInSeconds(),

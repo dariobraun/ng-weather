@@ -5,9 +5,9 @@ import { CachedData } from './model/cached-data';
   providedIn: 'root',
 })
 export class CachingService {
-  getCachedData(key: string): any | null {
+  getCachedData<T>(key: string): T | null {
     try {
-      const cachedData: CachedData = JSON.parse(localStorage.getItem(key));
+      const cachedData: CachedData<T> = JSON.parse(localStorage.getItem(key));
       const expirationDate = new Date(cachedData.timestamp);
       if (cachedData && expirationDate.getTime() > new Date().getTime()) {
         return cachedData.data;
@@ -18,7 +18,7 @@ export class CachingService {
     }
   }
 
-  cacheData(key: string, data: any, expiresInSeconds: number = 60 * 60 * 2) {
+  cacheData<T>(key: string, data: T, expiresInSeconds: number = 60 * 60 * 2) {
     const expirationDate = new Date();
     expirationDate.setSeconds(expirationDate.getSeconds() + expiresInSeconds);
     localStorage.setItem(
