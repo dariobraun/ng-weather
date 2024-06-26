@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
 import { ZipcodeEntryComponent } from './zipcode-entry/zipcode-entry.component';
@@ -36,6 +36,7 @@ import { TabComponent } from './tab/tab.component';
     }),
     TabsComponent,
     TabComponent,
+    ReactiveFormsModule,
   ],
   providers: [LocationService, WeatherService],
   bootstrap: [AppComponent],

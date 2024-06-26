@@ -1,4 +1,4 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { forkJoin, Observable, of } from 'rxjs';
 
 import { HttpClient } from '@angular/common/http';
@@ -10,7 +10,10 @@ import { toObservable } from '@angular/core/rxjs-interop';
 import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { CachingService } from './caching.service';
 
-@Injectable()
+const CONDITIONS = 'conditions';
+const FORECAST = 'forecasts';
+
+@Injectable({ providedIn: 'root' })
 export class WeatherService {
   static URL = 'https://api.openweathermap.org/data/2.5';
   static APPID = '5a4b2d457ecbef9eb2a71e480b947604';
@@ -21,34 +24,37 @@ export class WeatherService {
   locationService = inject(LocationService);
   cachingService = inject(CachingService);
 
+  cacheExpiresInSeconds = signal<number>(60 * 60 * 2);
+
   private currentConditions = toObservable(
     this.locationService.getLocations(),
   ).pipe(
     switchMap((locations) => {
       return forkJoin(
-        locations.map((zip) => {
-          const cachedData = this.cachingService.getCachedConditionData(zip);
-          return cachedData
-            ? of(cachedData)
-            : this.requestCurrentConditions(zip).pipe(
-                catchError(() => of(null)),
-              );
-        }),
+        locations.map((zip) => this.requestCurrentConditions(zip)),
       );
     }),
   );
 
   requestCurrentConditions(zipcode: string): Observable<ConditionsAndZip> {
-    return this.http
-      .get<CurrentConditions>(
-        `${WeatherService.URL}/weather?zip=${zipcode},us&units=imperial&APPID=${WeatherService.APPID}`,
-      )
-      .pipe(
-        map((data) => ({ data, zip: zipcode })),
-        tap((data) => {
-          this.cachingService.cacheConditionData(data);
-        }),
-      );
+    const cachedData = this.cachingService.getCachedData(CONDITIONS + zipcode);
+    return cachedData
+      ? of(cachedData)
+      : this.http
+          .get<CurrentConditions>(
+            `${WeatherService.URL}/weather?zip=${zipcode},us&units=imperial&APPID=${WeatherService.APPID}`,
+          )
+          .pipe(
+            map((data) => ({ data, zip: zipcode })),
+            tap((data) => {
+              this.cachingService.cacheData(
+                CONDITIONS + data.zip,
+                data,
+                this.cacheExpiresInSeconds(),
+              );
+            }),
+            catchError(() => of(null)),
+          );
   }
 
   getCurrentConditions(): Observable<ConditionsAndZip[]> {
@@ -56,9 +62,22 @@ export class WeatherService {
   }
 
   getForecast(zipcode: string): Observable<Forecast> {
-    return this.http.get<Forecast>(
-      `${WeatherService.URL}/forecast/daily?zip=${zipcode},us&units=imperial&cnt=5&APPID=${WeatherService.APPID}`,
-    );
+    const cachedData = this.cachingService.getCachedData(FORECAST + zipcode);
+    return cachedData
+      ? of(cachedData)
+      : this.http
+          .get<Forecast>(
+            `${WeatherService.URL}/forecast/daily?zip=${zipcode},us&units=imperial&cnt=5&APPID=${WeatherService.APPID}`,
+          )
+          .pipe(
+            tap((data) => {
+              this.cachingService.cacheData(
+                FORECAST + zipcode,
+                data,
+                this.cacheExpiresInSeconds(),
+              );
+            }),
+          );
   }
 
   getWeatherIcon(id): string {

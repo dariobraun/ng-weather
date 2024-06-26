@@ -1,4 +1,4 @@
-export interface CachedData<T> {
+export interface CachedData {
   timestamp: string;
-  data: T;
+  data: any;
 }

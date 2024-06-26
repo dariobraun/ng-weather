@@ -1,4 +1,14 @@
 <div class="container-fluid">
-  <app-zipcode-entry> </app-zipcode-entry>
+  <app-zipcode-entry></app-zipcode-entry>
   <app-current-conditions></app-current-conditions>
+  <div style="margin-top: 2rem">
+    <label style="margin-right: 1rem" for="expiresIn"
+      >Cache duration in seconds</label
+    >
+    <input
+      type="number"
+      id="expiresIn"
+      [formControl]="expiresInSecondsFormControl"
+    />
+  </div>
 </div>
